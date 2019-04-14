@@ -1,63 +1,47 @@
 import React, {Component} from "react";
 import axios from 'axios';
+import TodosList from "./todos-list.component";
 
 class TodoEdit extends Component {
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            todo_description: '',
-            todo_responsible: '',
-            todo_priority: '',
-            todo_completed: false
+    state = {
+        todo_description: "default",
+        todo_responsible: "default",
+        todo_priority: "default",
+        todo_completed: false
+    }
+ 
+    componentDidMount(){
+        let self = this;
+        try{
+            axios.get("http://localhost:4000/todos/"+this.props.match.params.id).then(function(response){
+                console.log(response.data.todo_description);
+                self.setState({
+                    todo_description: response.data.todo_description,
+                    todo_completed: response.data.todo_completed,
+                    todo_priority: response.data.todo_priority,
+                    todo_responsible: response.data.todo_responsible
+                });
+            });
+            
+        } catch(e){
+            console.log("Error on component mount. " + e);
         }
     }
 
-    componentDidMount(){
-        axios.post('http://localhost:4000/todos/' + this.props.match.params.id)
-        .then(response => {
-            this.setState({
-                todo_description: response.data.todo_description,
-                todo_responsible: response.data.todo_responsible,
-                todo_priority: response.data.todo_priority,
-                todo_completed: response.data.todo_completed
-            })
-        })
-        .catch(function(err) {
-            console.log(err);
-        });
-    }
-
-    render() {
-        return (
+    render(){
+        return(
             <div>
-                <p>Welcome to my Edit Controller.</p>
-                {
-                    axios.post('http://localhost:4000/todos/' + this.props.match.params.id)
-                    .then(response => {
-                        this.setState({
-                            todo_description: response.data.todo_description,
-                            todo_responsible: response.data.todo_responsible,
-                            todo_priority: response.data.todo_priority,
-                            todo_completed: response.data.todo_completed
-                        })
-                    })
-                    .catch(function(err) {
-                        console.log(err);
-                    })
-                }
-                {
-                    axios.post('http://localhost:4000/todos/update/' + this.props.match.params.id, {
-                        todo_description: this.state.todo_description,
-                        todo_responsible: this.state.todo_responsible,
-                        todo_priority: this.state.todo_priority,
-                        todo_completed: true
-                    })
-                }
+                <h3>Update Todo</h3>
+                <h6>Todo description: </h6>
+                <p>{ this.state.todo_description }</p>
+                <h6>Responsible:</h6>
+                <p>{ this.state.todo_responsible }</p>
+                <h6>Priority:</h6>
+                <p>{ this.state.todo_priority }</p>
+                <h6>Status:</h6>
+                <p>{ this.state.todo_completed === true ? "Done" : "InComplete" }</p>
             </div>
         );
     }
 }
-
 export default TodoEdit;
